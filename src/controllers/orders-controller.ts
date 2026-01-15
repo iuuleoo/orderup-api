@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "@/utils/AppError";
+import { knex } from "@/database/knex";
 import { z } from "zod";
 
 export class OrdersController {
@@ -13,6 +15,26 @@ export class OrdersController {
       const { table_session_id, product_id, quantity } = bodySchema.parse(
         request.body
       );
+
+      const session = await knex<TablesSessionsRepository>("tables_sessions")
+        .where({ id: table_session_id })
+        .first();
+
+      if (!session) {
+        throw new AppError("session table not found");
+      }
+
+      if (session.closed_at) {
+        throw new AppError("This session is already closed");
+      }
+
+      const product = await knex<ProductRepository>("products")
+        .where({ id: product_id })
+        .first();
+
+      if (!product) {
+        throw new AppError("Product not found");
+      }
 
       return response.status(201).json();
     } catch (error) {
