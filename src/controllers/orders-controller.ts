@@ -3,7 +3,7 @@ import { AppError } from "@/utils/AppError";
 import { knex } from "@/database/knex";
 import { z } from "zod";
 
-export class OrdersController {
+class OrdersController {
   async create(request: Request, response: Response, next: NextFunction) {
     try {
       const bodySchema = z.object({
@@ -48,4 +48,14 @@ export class OrdersController {
       next(error);
     }
   }
+
+  async index(request: Request, response: Response, next: NextFunction) {
+    try {
+      return response.json();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+
+export { OrdersController };
